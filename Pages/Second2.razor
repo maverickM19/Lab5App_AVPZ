@@ -1,0 +1,134 @@
+﻿@page "/second2"
+@using Lab5App.Application
+@inject SharedServices SharedServices
+
+ <MudPaper>
+    <MudGrid>
+        <MudItem xs="16">
+        <MudText Typo="Typo.h3" GutterBottom="true">The magnitude of the risks</MudText>
+        <MudContainer>
+        <MudPaper>
+        @{
+            var groupedRiskEvents = @SharedServices.RiskEvents
+            .GroupBy(r => r.Tag.Substring(0, 1))
+            .OrderBy(g => GetGroupSortOrder(g.Key))
+            .ToList();
+        }
+
+        @foreach (var group in groupedRiskEvents)
+        {
+            <MudTable Items="@group" Hover="true" Elevation="0">
+                <HeaderContent>
+                    <MudTh>Tag</MudTh>
+                    <MudTh>Name of risk event</MudTh>
+                    <MudTh>ER</MudTh>
+                    <MudTh>LRER</MudTh>
+                    <MudTh>VRER</MudTh>
+                    <MudTh>Starting price($ th.) @group.Select(x => x.RiskMoney).Sum().ToString("F3")</MudTh>
+                    <MudTh>Additional price($ th.) @group.Select(x => x.AdditionalCost).Sum().ToString("F3")</MudTh>
+                    <MudTh>Full price($ th.) @group.Select(x => x.FullPrice).Sum().ToString("F3")</MudTh>
+                    <MudTh>Priority</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Tag">@context.Tag</MudTd>
+                    <MudTd DataLabel="Name of risk event">@context.Name</MudTd>
+                    <MudTd DataLabel="ER">@context.ER.ToString("F3")</MudTd>
+                    <MudTd DataLabel="LRER">@context.LRER.ToString("F3")</MudTd>
+                    <MudTd DataLabel="VRER">@context.VRER.ToString("F3")</MudTd>
+                    <MudTd DataLabel="Money LRER">@context.RiskMoney.ToString("F3")</MudTd>
+                    <MudTd DataLabel="Additional cost($)">@context.AdditionalCost.ToString("F3")</MudTd>
+                    <MudTd DataLabel="Full cost($)">@context.FullPrice.ToString("F3")</MudTd>
+                    <MudTd DataLabel="Full cost($)">@context.Priority</MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+        </MudPaper>
+</MudContainer>
+        </MudItem>
+
+    </MudGrid>
+</MudPaper>
+
+@code {
+    double max;
+    double min;
+    double mpr;
+
+    protected override void OnInitialized()
+    {
+        RandomlyGenerateMagnitudeOfRisks();
+    }
+
+    private void RandomlyGenerateMagnitudeOfRisks()
+    {
+        foreach (var riskEvent in SharedServices.RiskEvents)
+        {
+            if (riskEvent.Tag.Contains("t"))
+            {
+                riskEvent.RiskMoney = (SharedServices.startingMoney[0] * riskEvent.LRER) / SharedServices.RiskEvents.Where(x => x.Tag != null && x.Tag.Contains("t")).Select(x => x.LRER).Sum();
+            }
+            else if (riskEvent.Tag.Contains("c"))
+            {
+                riskEvent.RiskMoney = (SharedServices.startingMoney[1] * riskEvent.LRER) / SharedServices.RiskEvents.Where(x => x.Tag != null && x.Tag.Contains("c")).Select(x => x.LRER).Sum();
+            }
+            else if (riskEvent.Tag.Contains("p"))
+            {
+                riskEvent.RiskMoney = (SharedServices.startingMoney[2] * riskEvent.LRER) / SharedServices.RiskEvents.Where(x => x.Tag != null && x.Tag.Contains("p")).Select(x => x.LRER).Sum();
+            }
+            else if (riskEvent.Tag.Contains("m"))
+            {
+                riskEvent.RiskMoney = (SharedServices.startingMoney[3] * riskEvent.LRER) / SharedServices.RiskEvents.Where(x => x.Tag != null && x.Tag.Contains("m")).Select(x => x.LRER).Sum();
+            }
+
+            riskEvent.VRER = riskEvent.RiskMoney * riskEvent.ER;
+        }
+
+        var groupRiskEvents = @SharedServices.RiskEvents
+       .GroupBy(r => r.Tag.Substring(0, 1))
+       .OrderBy(g => GetGroupSortOrder(g.Key))
+       .ToList();
+
+
+        foreach (var riskEvent in SharedServices.RiskEvents)
+        {
+            riskEvent.AdditionalCost = riskEvent.RiskProbability.Sum() / riskEvent.RiskMoney;
+            riskEvent.FullPrice = riskEvent.RiskMoney + riskEvent.AdditionalCost;
+        }
+
+        max = groupRiskEvents.SelectMany(group => group.Select(x => x.AdditionalCost)).Max();
+        min = groupRiskEvents.SelectMany(group => group.Select(x => x.AdditionalCost)).Min();
+        mpr = (max - min) / 3;
+
+        foreach (var riskEvent in SharedServices.RiskEvents)
+        {
+            if (riskEvent.AdditionalCost >= min && riskEvent.AdditionalCost < (min + mpr))
+            {
+                riskEvent.Priority = Priority.Low;
+            }
+            else if (riskEvent.AdditionalCost >= min + mpr && riskEvent.AdditionalCost < (min + 2 * mpr))
+            {
+                riskEvent.Priority = Priority.Medium;
+            }
+            else if (riskEvent.AdditionalCost >= (min + 2 * mpr) && riskEvent.AdditionalCost <= max)
+            {
+                riskEvent.Priority = Priority.High;
+            }
+            else
+            {
+                riskEvent.Priority = Priority.OutOfRange;
+            }
+        }
+    }
+
+    int GetGroupSortOrder(string tagPrefix)
+    {
+        switch (tagPrefix)
+        {
+            case "t": return 1;
+            case "c": return 2;
+            case "p": return 3;
+            case "m": return 3;
+            default: return 5;
+        }
+    }
+}

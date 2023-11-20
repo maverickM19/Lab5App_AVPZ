@@ -1,0 +1,84 @@
+﻿@page "/second1"
+
+@inherits MudComponentBase
+@using Lab5App.Application
+@inject SharedServices SharedServices
+
+<MudText Typo="Typo.h3" GutterBottom="true">Determining the probability of occurrence of risk events</MudText>
+<MudContainer>
+    <MudPaper>
+        @{
+            var groupedRiskEvents = @SharedServices.RiskEvents
+            .GroupBy(r => r.Tag.Substring(0, 1))
+            .OrderBy(g => GetGroupSortOrder(g.Key))
+            .ToList();
+        }
+
+        @foreach (var group in groupedRiskEvents)
+        {
+            <MudTable Items="@group" Hover="true" Elevation="0">
+                <HeaderContent>
+                    <MudTh>Tag</MudTh>
+                    <MudTh>Name of risk event</MudTh>
+                    <MudTh>per 1</MudTh>
+                    <MudTh>per 2</MudTh>
+                    <MudTh>per 3</MudTh>
+                    <MudTh>per 4</MudTh>
+                    <MudTh>per 5</MudTh>
+                    <MudTh>per 6</MudTh>
+                    <MudTh>per 7</MudTh>
+                    <MudTh>per 8</MudTh>
+                    <MudTh>per 9</MudTh>
+                    <MudTh>per 10</MudTh>
+                    <MudTh>ER</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Tag">@context.Tag</MudTd>
+                    <MudTd DataLabel="Name of risk event">@context.Name</MudTd>
+                    @foreach (var mark in @context.RiskProbability.Select((value, index) => new { value, index }))
+                    {
+                        <MudTd>
+                            <MudTextField @bind-Value="context.RiskProbability[mark.index]" Format="F2" TextChanged="UpdateER" Immediate = "false"/>
+                        </MudTd>
+                    }
+                    <MudTd DataLabel="ER">@context.ER.ToString("F2")</MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    </MudPaper>
+</MudContainer>
+
+@code {
+    protected override void OnInitialized()
+    {
+    }
+
+    int GetGroupSortOrder(string tagPrefix)
+    {
+        switch (tagPrefix)
+        {
+            case "t": return 1;
+            case "c": return 2;
+            case "p": return 3;
+            case "m": return 3;
+            default: return 5;
+        }
+    }
+
+    void UpdateER()
+    {
+        var groupedRiskEvents = @SharedServices.RiskEvents
+        .GroupBy(r => r.Tag.Substring(0, 1)) // Group by the first character of the Tag
+        .OrderBy(g => GetGroupSortOrder(g.Key))
+        .ToList();
+        foreach (var group in groupedRiskEvents)
+        {
+            foreach (var item in group)
+            {
+                item.ER = item.RiskProbability.Average();
+            }
+        }
+
+        StateHasChanged();
+    }
+}

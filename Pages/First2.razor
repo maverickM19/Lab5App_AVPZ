@@ -1,0 +1,60 @@
+﻿@page "/first2"
+@inherits MudComponentBase
+@inject HttpClient Http
+@using Lab5App.Application
+@inject SharedServices SharedServices
+
+@if (SharedServices.RiskEvents == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudPaper>
+    <MudGrid>
+        <MudItem xs="12" md="8">
+    <MudText Typo="Typo.h3" GutterBottom="true">Identification of potential risk events</MudText>
+    <MudContainer>
+        <MudPaper>
+            <MudTable Items="@SharedServices.RiskEvents" Hover="true" Elevation="0">
+                <HeaderContent>
+                    <MudTh>Tag</MudTh>
+                    <MudTh>Name of risk event</MudTh>
+                    <MudTh>Value</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Tag">@context.Tag</MudTd>
+                    <MudTd DataLabel="Name of risk event">@context.Name</MudTd>
+                    <MudTd DataLabel="Value">@context.Value</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudPaper>
+    </MudContainer>
+            </MudItem>
+            <MudItem xs="12" md="4" class="mt-4">
+                <MudTable Items="@categories" Hover="true" Elevation="0">
+                    <HeaderContent>
+                        <MudTh>Risks</MudTh>
+                        <MudTh>Percentage</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Tag">@context.Key</MudTd>
+                        <MudTd DataLabel="Name of risk event">@context.Value.ToString("F2")%</MudTd>
+                    </RowTemplate>
+
+                </MudTable>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+}z
+@code {
+    public Dictionary<string, double> categories = new Dictionary<string, double>();
+
+    protected override void OnInitialized()
+    {
+        categories.Add("Technical Risks", (double)@SharedServices.RiskEvents.Where(x => x.Tag != null && x.Tag.Contains("t")).Count() / (double)@SharedServices.RiskEvents.Count() * 100);
+        categories.Add("Financial Risks", (double)@SharedServices.RiskEvents.Where(x => x.Tag != null && x.Tag.Contains("c")).Count() / (double)@SharedServices.RiskEvents.Count() * 100);
+        categories.Add("Planned Risks", (double)@SharedServices.RiskEvents.Where(x => x.Tag != null && x.Tag.Contains("p")).Count() / (double)@SharedServices.RiskEvents.Count() * 100);
+        categories.Add("Management Risks", (double)@SharedServices.RiskEvents.Where(x => x.Tag != null && x.Tag.Contains("m")).Count() / (double)@SharedServices.RiskEvents.Count() * 100);
+    }
+}

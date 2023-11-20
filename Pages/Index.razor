@@ -1,0 +1,51 @@
+﻿@page "/"
+@inherits MudComponentBase
+@inject HttpClient Http
+@using Lab5App.Application
+@inject SharedServices SharedServices
+
+<PageTitle>Index</PageTitle>
+
+<MudText Class="mb-8">Welcome to an ADEQUATE Mathematical Application of Software Development Risk Management aka ADEQUATE MASDRM</MudText>
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        Random random = new Random();
+
+        SharedServices.RiskEvents = await Http.GetFromJsonAsync<List<RiskEvent>>("sample-data/events.json");
+        SharedServices.Solutions = await Http.GetFromJsonAsync<List<Solution>>("sample-data/solutions.json");
+        SharedServices.RiskSources = await Http.GetFromJsonAsync<List<RiskSource>>("sample-data/risks_category.json");
+
+        foreach (var riskEvent in SharedServices.RiskEvents)
+        {
+            riskEvent.SelectedSolution = SharedServices.Solutions.FirstOrDefault().Value;
+        }
+
+        foreach (var riskEvent in @SharedServices.RiskEvents)
+        {
+            riskEvent.RiskProbability = new List<double>();
+            for (int i = 0; i < 10; i++)
+            {
+                double mark = random.NextDouble() * (0.80 - 0.10) + 0.10;
+                riskEvent.RiskProbability.Add(mark);
+            }
+            riskEvent.ER = riskEvent.RiskProbability.Average();
+        }
+
+        foreach (var riskEvent in SharedServices.RiskEvents)
+        {
+            riskEvent.LRER = random.NextDouble() * (0.20 - 0.05) + 0.05;
+        }
+
+
+        SharedServices.startingMoney = new List<double>();
+        SharedServices.startingMoney.Add(60);
+        SharedServices.startingMoney.Add(130);
+        SharedServices.startingMoney.Add(90);
+        SharedServices.startingMoney.Add(160);
+
+        SharedServices.finalMoney = new List<double>();
+    }
+}

@@ -1,0 +1,19 @@
+[
+  {
+    "Tag": "t1",
+    "Name": "Delays in the supply of equipment needed to support the process, software development",
+    "Value": 1
+  },
+
+  {
+    "Tag": "t2",
+    "Name": "Delays in the supply of tools required for support, software development process",
+    "Value": 1
+  },
+
+  {
+    "Tag": "t3",
+    "Name": "Reluctance of the software implementation team to use tools, to support the software development process",
+    "Value": 1
+  }
+]

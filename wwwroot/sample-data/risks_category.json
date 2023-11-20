@@ -1,0 +1,92 @@
+[
+  {
+    "Tag": "t1",
+    "Name": "Functional characteristics of software",
+    "Value": 1
+  },
+  {
+    "Tag": "t2",
+    "Name": "Quality characteristics of software",
+    "Value": 2
+  },
+  {
+    "Tag": "t3",
+    "Name": "Reliability characteristics of software",
+    "Value": 3
+  },
+  {
+    "Tag": "t4",
+    "Name": "Applicability of software",
+    "Value": 4
+  },
+  {
+    "Tag": "t5",
+    "Name": "Time efficiency of software",
+    "Value": 5
+  },
+  {
+    "Tag": "t6",
+    "Name": "Supportability of software",
+    "Value": 6
+  },
+  {
+    "Tag": "t7",
+    "Name": "Reuse of software components",
+    "Value": 7
+  },
+  {
+    "Tag": "c1",
+    "Name": "Limitation of the total budget for the software project",
+    "Value": 1
+  },
+  {
+    "Tag": "c2",
+    "Name": "Inaccessible cost of implementing the software project",
+    "Value": 2
+  },
+  {
+    "Tag": "c3",
+    "Name": "Low realism in estimating costs for the software project",
+    "Value": 3
+  },
+  {
+    "Tag": "p1",
+    "Name": "Flexibility in making changes to development life cycle plans",
+    "Value": 4
+  },
+  {
+    "Tag": "p2",
+    "Name": "Violation of established deadlines in the development life cycle",
+    "Value": 5
+  },
+  {
+    "Tag": "p3",
+    "Name": "Low realism in setting plans and stages in the development life cycle",
+    "Value": 6
+  },
+  {
+    "Tag": "m1",
+    "Name": "Incorrect strategy for implementing the software project",
+    "Value": 7
+  },
+  {
+    "Tag": "m2",
+    "Name": "Ineffective project planning",
+    "Value": 8
+  },
+  {
+    "Tag": "m3",
+    "Name": "Poor assessment of the software project",
+    "Value": 9
+  },
+  {
+    "Tag": "m4",
+    "Name": "Gaps in documenting stages of the software project",
+    "Value": 10
+  },
+  {
+    "Tag": "m5",
+    "Name": "Mistakes in forecasting software project results",
+    "Value": 11
+  }
+]

@@ -1,0 +1,84 @@
+﻿@page "/fourth1"
+
+@inherits MudComponentBase
+@using Lab5App.Application
+@inject SharedServices SharedServices
+
+<MudText Typo="Typo.h3" GutterBottom="true">Risk assessment after applying the selected measures</MudText>
+<MudContainer>
+    <MudPaper>
+        @{
+            var groupedRiskEvents = @SharedServices.RiskEvents
+            .GroupBy(r => r.Tag.Substring(0, 1))
+            .OrderBy(g => GetGroupSortOrder(g.Key))
+            .ToList();
+        }
+
+        @foreach (var group in groupedRiskEvents)
+        {
+            <MudTable Items="@group" Hover="true" Elevation="0">
+                <HeaderContent>
+                    <MudTh>Tag</MudTh>
+                    <MudTh>Name of risk event</MudTh>
+                    <MudTh>per 1</MudTh>
+                    <MudTh>per 2</MudTh>
+                    <MudTh>per 3</MudTh>
+                    <MudTh>per 4</MudTh>
+                    <MudTh>per 5</MudTh>
+                    <MudTh>per 6</MudTh>
+                    <MudTh>per 7</MudTh>
+                    <MudTh>per 8</MudTh>
+                    <MudTh>per 9</MudTh>
+                    <MudTh>per 10</MudTh>
+                    <MudTh>ERPER</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Tag">@context.Tag</MudTd>
+                    <MudTd DataLabel="Name of risk event">@context.Name</MudTd>
+                    @foreach (var mark in @context.RiskProbability)
+                    {
+                        <MudTd>@mark.ToString("F2")</MudTd>
+                    }
+                    <MudTd DataLabel="ERPER">@context.ER.ToString("F2")</MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    </MudPaper>
+</MudContainer>
+
+@code {
+    protected override void OnInitialized()
+    {
+        UpdateMarks();
+    }
+
+    private void UpdateMarks()
+    {
+        Random random = new Random();
+
+        foreach (var riskEvent in @SharedServices.RiskEvents)
+        {
+            //riskEvent.RiskProbability.Select(x => x -= random.NextDouble() * (0.20 - 0.01) + 0.01);
+            //riskEvent.RiskProbability.ForEach(x => x = x - random.NextDouble() * (0.20 - 0.01) + 0.01);
+            for (int i = 0; i < 10; i++)
+            {
+                var test = random.NextDouble() * (0.20 - 0.01) + 0.01;
+                riskEvent.RiskProbability[i] = (riskEvent.RiskProbability[i] - test) > 0 ? riskEvent.RiskProbability[i] - test : 0;
+            }
+
+            riskEvent.ER = riskEvent.RiskProbability.Average();
+        }
+    }
+
+    int GetGroupSortOrder(string tagPrefix)
+    {
+        switch (tagPrefix)
+        {
+            case "t": return 1;
+            case "c": return 2;
+            case "p": return 3;
+            case "m": return 3;
+            default: return 5;
+        }
+    }
+}
